@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Diurno Padova - Sistema Gestione Trasporti</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 10px; }
+        
+        /* Header */
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header h1 { color: #1f2937; font-size: 24px; margin-bottom: 5px; }
+        .header p { color: #6b7280; }
+        
+        /* Navigation */
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-btn { background: #3b82f6; color: white; border: none; padding: 12px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .nav-btn.active { background: #1d4ed8; }
+        .nav-btn:hover { background: #2563eb; }
+        
+        /* Cards and Layout */
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat { padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-blue { background: #dbeafe; color: #1e40af; }
+        .stat-green { background: #dcfce7; color: #166534; }
+        .stat-yellow { background: #fef3c7; color: #92400e; }
+        .stat-red { background: #fecaca; color: #991b1b; }
+        .stat h3 { font-size: 14px; margin-bottom: 8px; }
+        .stat .number { font-size: 28px; font-weight: bold; }
+        
+        /* Buttons */
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 4px; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn:hover { opacity: 0.9; }
+        
+        /* Utilities */
+        .hidden { display: none; }
+        .flex { display: flex; align-items: center; gap: 10px; }
+        .justify-between { justify-content: space-between; }
+        .text-center { text-align: center; }
+        .mb-20 { margin-bottom: 20px; }
+        
+        /* Upload Area */
+        .upload-area { border: 2px dashed #d1d5db; border-radius: 8px; padding: 40px; text-align: center; margin: 20px 0; cursor: pointer; }
+        .upload-area:hover { border-color: #3b82f6; background: #f8fafc; }
+        
+        /* User Cards */
+        .user-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .user-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white; }
+        .user-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
+        .user-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
+        .detail-item { background: #f9fafb; padding: 8px; border-radius: 4px; font-size: 12px; }
+        .detail-label { color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-value { color: #1f2937; font-weight: 500; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fecaca; color: #991b1b; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        
+        /* Messages */
+        .success-message { background: #dcfce7; color: #166534; padding: 12px; border-radius: 6px; margin: 12px 0; }
+        .error-message { background: #fecaca; color: #991b1b; padding: 12px; border-radius: 6px; margin: 12px 0; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 24px; border-radius: 8px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 4px; font-weight: 500; color: #374151; }
+        .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .form-checkbox { display: flex; align-items: center; gap: 8px; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 8px; }
+            .nav { flex-direction: column; }
+            .nav-btn { text-align: center; }
+            .stats { grid-template-columns: 1fr; }
+            .user-grid { grid-template-columns: 1fr; }
+            .user-details { grid-template-columns: 1fr; }
+            .modal-content { width: 95%; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏢 Centro Diurno Padova</h1>
+            <p>Via Due Palazzi 16, Padova - Sistema Gestione Trasporti</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('dashboard')">📊 Dashboard</button>
+            <button class="nav-btn" onclick="showSection('users')">👥 Utenti</button>
+            <button class="nav-btn" onclick="showSection('operators')">🚗 Operatori</button>
+            <button class="nav-btn" onclick="showSection('vehicles')">🚐 Veicoli</button>
+            <button class="nav-btn" onclick="showSection('routes')">🗺️ Percorsi</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section">
+            <div class="stats">
+                <div class="stat stat-blue">
+                    <h3>Utenti Totali</h3>
+                    <div class="number" id="stat-users">0</div>
+                </div>
+                <div class="stat stat-green">
+                    <h3>Con Carrozzina</h3>
+                    <div class="number" id="stat-wheelchair">0</div>
+                </div>
+                <div class="stat stat-yellow">
+                    <h3>Con Pedane Laterali</h3>
+                    <div class="number" id="stat-pedals">0</div>
+                </div>
+                <div class="stat stat-red">
+                    <h3>Priorità Alta</h3>
+                    <div class="number" id="stat-priority">0</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">📁 Carica il tuo file Excel</h3>
+                <div class="upload-area" onclick="document.getElementById('excel-input').click()">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📂</div>
+                    <h4>Clicca qui per caricare il file Excel</h4>
+                    <p style="color: #6b7280; margin-top: 8px;">File utenti centro diurno (.xlsx)</p>
+                    <input type="file" id="excel-input" accept=".xlsx,.xls" style="display: none;">
+                </div>
+                <div id="upload-status"></div>
+                
+                <div style="margin-top: 20px;">
+                    <h4>🚀 Azioni Rapide</h4>
+                    <button class="btn btn-primary" onclick="optimizeRoutes()">🗺️ Ottimizza Percorsi</button>
+                    <button class="btn btn-success" onclick="alert('📅 Funzionalità pianificazione disponibile!')">📅 Pianificazione</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users" class="section hidden">
+            <div class="card">
+                <div class="flex justify-between mb-20">
+                    <h2>👥 Utenti Caricati (<span id="users-count">0</span>)</h2>
+                    <div class="flex">
+                        <button class="btn btn-primary" onclick="openAddModal()">➕ Aggiungi</button>
+                        <button class="btn btn-success" onclick="exportToExcel()">📤 Esporta Excel</button>
+                    </div>
+                </div>
+                <div id="users-content"></div>
+            </div>
+        </div>
+
+        <!-- Operators Section -->
+        <div id="operators" class="section hidden">
+            <div class="card">
+                <div class="flex justify-between mb-20">
+                    <h2>🚗 Operatori (<span id="operators-count">3</span>)</h2>
+                    <div class="flex">
+                        <button class="btn btn-primary" onclick="openAddOperatorModal()">➕ Aggiungi Operatore</button>
+                        <button class="btn btn-success" onclick="exportOperatorsToExcel()">📤 Esporta Excel</button>
+                    </div>
+                </div>
+
+                <!-- Area caricamento Excel Operatori -->
+                <div class="card" style="margin-bottom: 20px; background: #f8fafc; border: 2px dashed #cbd5e1;">
+                    <h3 style="margin-bottom: 16px; color: #475569;">📁 Carica Operatori da Excel</h3>
+                    <div class="upload-area" onclick="document.getElementById('operators-excel-input').click()" style="padding: 30px; border: 2px dashed #94a3b8;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🚗</div>
+                        <h4>Clicca qui per caricare il template operatori</h4>
+                        <p style="color: #6b7280; margin-top: 8px;">template_operatori_centro_diurno.xlsx</p>
+                        <input type="file" id="operators-excel-input" accept=".xlsx,.xls" style="display: none;">
+                    </div>
+                    <div id="operators-upload-status"></div>
+                </div>
+
+                <div class="user-grid" id="operators-content"></div>
+            </div>
+        </div>
+
+        <!-- Vehicles Section -->
+        <div id="vehicles" class="section hidden">
+            <div class="card">
+                <div class="flex justify-between mb-20">
+                    <h2>🚐 Veicoli (<span id="vehicles-count">3</span>)</h2>
+                    <button class="btn btn-primary" onclick="openAddVehicleModal()">➕ Aggiungi Veicolo</button>
+                </div>
+                <div class="user-grid" id="vehicles-content"></div>
+            </div>
+        </div>
+
+        <!-- Routes Section -->
+        <div id="routes" class="section hidden">
+            <div class="card">
+                <div class="flex justify-between mb-20">
+                    <h2>🗺️ Percorsi Ottimizzati</h2>
+                    <button class="btn btn-success" onclick="optimizeRoutes()">🔄 Ricalcola</button>
+                </div>
+                <div id="routes-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Utenti -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Aggiungi Nuovo Utente</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Nome Completo</label>
+                <input id="edit-name" class="form-input" type="text" placeholder="Nome e cognome">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Indirizzo</label>
+                <input id="edit-address" class="form-input" type="text" placeholder="Via, numero civico, città">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Telefono</label>
+                <input id="edit-phone" class="form-input" type="text" placeholder="333-1234567">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-wheelchair" type="checkbox">
+                    <span>Necessita di carrozzina</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-pedals" type="checkbox">
+                    <span>Necessita di pedane laterali</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Giorni</label>
+                <input id="edit-days" class="form-input" type="text" value="Lun,Mar,Mer,Gio,Ven">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Turni</label>
+                <select id="edit-shifts" class="form-input">
+                    <option value="Entrambi">Entrambi</option>
+                    <option value="Mattina">Solo Mattina</option>
+                    <option value="Pomeriggio">Solo Pomeriggio</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Priorità</label>
+                <select id="edit-priority" class="form-input">
+                    <option value="Normale">Normale</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Bassa">Bassa</option>
+                </select>
+            </div>
+
+            <!-- Nuovi campi per gestione trasporti -->
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-morning-trip" type="checkbox">
+                    <span>Viaggio del mattino (andata)</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Priorità pickup mattino</label>
+                <select id="edit-morning-priority" class="form-input">
+                    <option value="normale">Normale</option>
+                    <option value="primo">Deve essere preso per primo</option>
+                    <option value="ultimo">Deve essere preso per ultimo</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-afternoon-trip" type="checkbox">
+                    <span>Viaggio del pomeriggio (ritorno)</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Priorità pickup pomeriggio</label>
+                <select id="edit-afternoon-priority" class="form-input">
+                    <option value="normale">Normale</option>
+                    <option value="primo">Deve essere preso per primo</option>
+                    <option value="ultimo">Deve essere preso per ultimo</option>
+                </select>
+            </div>
+            
+            <div class="flex" style="gap: 12px;">
+                <button class="btn btn-primary" onclick="saveUser()" style="flex: 1;">Salva</button>
+                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Operatori -->
+    <div id="operator-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="operator-modal-title">Aggiungi Nuovo Operatore</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Nome Completo</label>
+                <input id="edit-operator-name" class="form-input" type="text" placeholder="Nome e cognome">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Telefono</label>
+                <input id="edit-operator-phone" class="form-input" type="text" placeholder="333-1234567">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Turno di Lavoro</label>
+                <select id="edit-operator-shift" class="form-input">
+                    <option value="mattina">Mattina (08:30)</option>
+                    <option value="pomeriggio">Pomeriggio (15:30)</option>
+                    <option value="entrambi">Entrambi i turni</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-operator-special" type="checkbox">
+                    <span>Guida veicoli speciali (passo lungo/abilitazione speciale)</span>
+                </label>
+            </div>
+            
+            <div class="flex" style="gap: 12px;">
+                <button class="btn btn-primary" onclick="saveOperator()" style="flex: 1;">Salva</button>
+                <button class="btn btn-secondary" onclick="closeOperatorModal()" style="flex: 1;">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Veicoli -->
+    <div id="vehicle-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="vehicle-modal-title">Aggiungi Nuovo Veicolo</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Nome Veicolo</label>
+                <input id="edit-vehicle-name" class="form-input" type="text" placeholder="es: Pulmino D">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Targa</label>
+                <input id="edit-vehicle-plate" class="form-input" type="text" placeholder="es: AB123CD">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Posti totali disponibili (escluso autista)</label>
+                <input id="edit-vehicle-seats" class="form-input" type="number" min="4" max="12" value="6">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-vehicle-lift" type="checkbox">
+                    <span>Ha pedana elevatrice per carrozzine</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Posti carrozzina (solo se ha pedana)</label>
+                <input id="edit-vehicle-wheelchair" class="form-input" type="number" min="0" max="8" value="0">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-vehicle-side-platform" type="checkbox">
+                    <span>Ha pedana laterale</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-vehicle-long-base" type="checkbox">
+                    <span>È a passo lungo</span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-checkbox">
+                    <input id="edit-vehicle-special-license" type="checkbox">
+                    <span>Richiede guida speciale/abilitazione</span>
+                </label>
+            </div>
+            
+            <div class="flex" style="gap: 12px;">
+                <button class="btn btn-primary" onclick="saveVehicle()" style="flex: 1;">Salva</button>
+                <button class="btn btn-secondary" onclick="closeVehicleModal()" style="flex: 1;">Annulla</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // DATI GLOBALI
+        const appData = {
+            users: [],
+            editingUserId: null,
+            routes: [],
+            operators: [
+                {id: 1, name: 'Marco Operatore', phone: '333-1111111', shift: 'mattina', canDriveSpecial: true},
+                {id: 2, name: 'Laura Autista', phone: '333-2222222', shift: 'mattina', canDriveSpecial: false},
+                {id: 3, name: 'Paolo Guida', phone: '333-3333333', shift: 'pomeriggio', canDriveSpecial: true}
+            ],
+            vehicles: [
+                {id: 1, name: 'Pulmino A', plate: 'AB123CD', hasLift: true, wheelchairSpots: 2, totalSeats: 6, isLongBase: false, needsSpecialLicense: false, hasSidePlatform: true},
+                {id: 2, name: 'Pulmino B', plate: 'EF456GH', hasLift: false, wheelchairSpots: 0, totalSeats: 6, isLongBase: false, needsSpecialLicense: false, hasSidePlatform: false},
+                {id: 3, name: 'Pulmino C', plate: 'IL789MN', hasLift: true, wheelchairSpots: 3, totalSeats: 8, isLongBase: true, needsSpecialLicense: true, hasSidePlatform: true}
+            ],
+            editingOperatorId: null,
+            editingVehicleId: null
+        };
+
+        // ===== FUNZIONI PRINCIPALI =====
+
+        // Navigazione
+        function showSection(sectionName) {
+            // Nascondi tutte le sezioni
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            
+            // Rimuovi active da tutti i bottoni
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Mostra sezione corrente
+            document.getElementById(sectionName).classList.remove('hidden');
+            
+            // Attiva bottone corrente
+            event.target.classList.add('active');
+            
+            // Renderizza contenuto
+            if (sectionName === 'users') renderUsers();
+            if (sectionName === 'operators') renderOperators();
+            if (sectionName === 'vehicles') renderVehicles();
+            if (sectionName === 'routes') renderRoutes();
+        }
+
+        // Messaggi
+        function showMessage(message, type = 'success') {
+            const statusDiv = document.getElementById('upload-status');
+            statusDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 4000);
+        }
+
+        // Aggiorna statistiche
+        function updateStats() {
+            const totalUsers = appData.users.length;
+            const wheelchairUsers = appData.users.filter(u => u.needsWheelchair).length;
+            const pedalUsers = appData.users.filter(u => u.needsPedals).length;
+            const priorityUsers = appData.users.filter(u => u.priority === 'Alta').length;
+            
+            document.getElementById('stat-users').textContent = totalUsers;
+            document.getElementById('stat-wheelchair').textContent = wheelchairUsers;
+            document.getElementById('stat-pedals').textContent = pedalUsers;
+            document.getElementById('stat-priority').textContent = priorityUsers;
+            document.getElementById('users-count').textContent = totalUsers;
+            document.getElementById('operators-count').textContent = appData.operators.length;
+            document.getElementById('vehicles-count').textContent = appData.vehicles.length;
+        }
+
+        // ===== GESTIONE UTENTI =====
+
+        function renderUsers() {
+            const container = document.getElementById('users-content');
+            
+            if (appData.users.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center" style="padding: 40px; color: #6b7280;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+                        <p>Nessun utente caricato</p>
+                        <p style="font-size: 14px;">Carica il file Excel per vedere gli utenti</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `<div class="user-grid">${appData.users.map(user => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div>
+                            <h3 style="margin: 0; color: #1f2937;">${user.name}</h3>
+                            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">📍 ${user.address}</p>
+                            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">📞 ${user.phone || 'N/A'}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" onclick="editUser(${user.id})" style="padding: 6px 12px; font-size: 12px;">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id})" style="padding: 6px 12px; font-size: 12px;">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Carrozzina</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.needsWheelchair ? 'badge-warning' : 'badge-success'}">
+                                    ${user.needsWheelchair ? '♿ SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Pedane</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.needsPedals ? 'badge-blue' : 'badge-success'}">
+                                    ${user.needsPedals ? '🔧 SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Viaggio Mattino</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.morningTrip ? 'badge-success' : 'badge-warning'}">
+                                    ${user.morningTrip ? '🌅 SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Pickup Mattino</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.morningPriority === 'primo' ? 'badge-danger' : user.morningPriority === 'ultimo' ? 'badge-warning' : 'badge-blue'}">
+                                    ${user.morningPriority === 'primo' ? '🥇 PRIMO' : user.morningPriority === 'ultimo' ? '🥉 ULTIMO' : '➡️ NORMALE'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Viaggio Pomeriggio</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.afternoonTrip ? 'badge-success' : 'badge-warning'}">
+                                    ${user.afternoonTrip ? '🌆 SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Pickup Pomeriggio</div>
+                            <div class="detail-value">
+                                <span class="badge ${user.afternoonPriority === 'primo' ? 'badge-danger' : user.afternoonPriority === 'ultimo' ? 'badge-warning' : 'badge-blue'}">
+                                    ${user.afternoonPriority === 'primo' ? '🥇 PRIMO' : user.afternoonPriority === 'ultimo' ? '🥉 ULTIMO' : '➡️ NORMALE'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Giorni</div>
+                            <div class="detail-value">${user.days}</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Turni</div>
+                            <div class="detail-value">
+                                <span class="badge badge-blue">${user.shifts}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function openAddModal() {
+            appData.editingUserId = null;
+            document.getElementById('modal-title').textContent = 'Aggiungi Nuovo Utente';
+            clearForm();
+            document.getElementById('user-modal').classList.add('show');
+        }
+
+        function editUser(userId) {
+            const user = appData.users.find(u => u.id === userId);
+            if (!user) return;
+
+            appData.editingUserId = userId;
+            document.getElementById('modal-title').textContent = `Modifica: ${user.name}`;
+            
+            document.getElementById('edit-name').value = user.name;
+            document.getElementById('edit-address').value = user.address;
+            document.getElementById('edit-phone').value = user.phone || '';
+            document.getElementById('edit-wheelchair').checked = user.needsWheelchair;
+            document.getElementById('edit-pedals').checked = user.needsPedals;
+            document.getElementById('edit-days').value = user.days;
+            document.getElementById('edit-shifts').value = user.shifts;
+            document.getElementById('edit-priority').value = user.priority;
+            
+            // Nuovi campi trasporti
+            document.getElementById('edit-morning-trip').checked = user.morningTrip || false;
+            document.getElementById('edit-morning-priority').value = user.morningPriority || 'normale';
+            document.getElementById('edit-afternoon-trip').checked = user.afternoonTrip || false;
+            document.getElementById('edit-afternoon-priority').value = user.afternoonPriority || 'normale';
+            
+            document.getElementById('user-modal').classList.add('show');
+        }
+
+        function deleteUser(userId) {
+            const user = appData.users.find(u => u.id === userId);
+            if (!user) return;
+
+            if (confirm(`Elimina "${user.name}"?`)) {
+                appData.users = appData.users.filter(u => u.id !== userId);
+                updateStats();
+                renderUsers();
+                showMessage(`✅ "${user.name}" eliminato`, 'success');
+            }
+        }
+
+        function saveUser() {
+            const name = document.getElementById('edit-name').value.trim();
+            const address = document.getElementById('edit-address').value.trim();
+            const phone = document.getElementById('edit-phone').value.trim();
+            const needsWheelchair = document.getElementById('edit-wheelchair').checked;
+            const needsPedals = document.getElementById('edit-pedals').checked;
+            const days = document.getElementById('edit-days').value.trim();
+            const shifts = document.getElementById('edit-shifts').value;
+            const priority = document.getElementById('edit-priority').value;
+            
+            // Nuovi campi trasporti
+            const morningTrip = document.getElementById('edit-morning-trip').checked;
+            const morningPriority = document.getElementById('edit-morning-priority').value;
+            const afternoonTrip = document.getElementById('edit-afternoon-trip').checked;
+            const afternoonPriority = document.getElementById('edit-afternoon-priority').value;
+
+            if (!name || !address) {
+                alert('❌ Nome e Indirizzo obbligatori');
+                return;
+            }
+
+            if (appData.editingUserId) {
+                const userIndex = appData.users.findIndex(u => u.id === appData.editingUserId);
+                if (userIndex !== -1) {
+                    appData.users[userIndex] = { 
+                        ...appData.users[userIndex], 
+                        name, address, phone, needsWheelchair, needsPedals, days, shifts, priority,
+                        morningTrip, morningPriority, afternoonTrip, afternoonPriority
+                    };
+                    showMessage(`✅ "${name}" modificato`, 'success');
+                }
+            } else {
+                const newId = Math.max(...appData.users.map(u => u.id), 0) + 1;
+                appData.users.push({ 
+                    id: newId, name, address, phone, needsWheelchair, needsPedals, days, shifts, priority,
+                    morningTrip, morningPriority, afternoonTrip, afternoonPriority
+                });
+                showMessage(`✅ "${name}" aggiunto`, 'success');
+            }
+
+            closeModal();
+            updateStats();
+            renderUsers();
+        }
+
+        function closeModal() {
+            document.getElementById('user-modal').classList.remove('show');
+            clearForm();
+            appData.editingUserId = null;
+        }
+
+        function clearForm() {
+            document.getElementById('edit-name').value = '';
+            document.getElementById('edit-address').value = '';
+            document.getElementById('edit-phone').value = '';
+            document.getElementById('edit-wheelchair').checked = false;
+            document.getElementById('edit-pedals').checked = false;
+            document.getElementById('edit-days').value = 'Lun,Mar,Mer,Gio,Ven';
+            document.getElementById('edit-shifts').value = 'Entrambi';
+            document.getElementById('edit-priority').value = 'Normale';
+            
+            // Nuovi campi trasporti
+            document.getElementById('edit-morning-trip').checked = false;
+            document.getElementById('edit-morning-priority').value = 'normale';
+            document.getElementById('edit-afternoon-trip').checked = false;
+            document.getElementById('edit-afternoon-priority').value = 'normale';
+        }
+
+        // ===== GESTIONE OPERATORI =====
+
+        function renderOperators() {
+            const container = document.getElementById('operators-content');
+            
+            if (appData.operators.length === 0) {
+                container.innerHTML = `<div class="text-center" style="padding: 40px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🚗</div><p>Nessun operatore</p></div>`;
+                return;
+            }
+
+            container.innerHTML = appData.operators.map(operator => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div>
+                            <h3 style="margin: 0; color: #1f2937;">${operator.name}</h3>
+                            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">📞 ${operator.phone || 'N/A'}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" onclick="editOperator(${operator.id})" style="padding: 6px 12px; font-size: 12px;">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteOperator(${operator.id})" style="padding: 6px 12px; font-size: 12px;">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Turno</div>
+                            <div class="detail-value"><span class="badge badge-blue">${operator.shift}</span></div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Veicoli Speciali</div>
+                            <div class="detail-value">
+                                <span class="badge ${operator.canDriveSpecial ? 'badge-success' : 'badge-warning'}">
+                                    ${operator.canDriveSpecial ? '✅ SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddOperatorModal() {
+            appData.editingOperatorId = null;
+            document.getElementById('operator-modal-title').textContent = 'Aggiungi Nuovo Operatore';
+            clearOperatorForm();
+            document.getElementById('operator-modal').classList.add('show');
+        }
+
+        function editOperator(operatorId) {
+            const operator = appData.operators.find(o => o.id === operatorId);
+            if (!operator) return;
+
+            appData.editingOperatorId = operatorId;
+            document.getElementById('operator-modal-title').textContent = `Modifica: ${operator.name}`;
+            
+            document.getElementById('edit-operator-name').value = operator.name;
+            document.getElementById('edit-operator-phone').value = operator.phone || '';
+            document.getElementById('edit-operator-shift').value = operator.shift;
+            document.getElementById('edit-operator-special').checked = operator.canDriveSpecial;
+            
+            document.getElementById('operator-modal').classList.add('show');
+        }
+
+        function deleteOperator(operatorId) {
+            const operator = appData.operators.find(o => o.id === operatorId);
+            if (!operator) return;
+
+            if (confirm(`Elimina l'operatore "${operator.name}"?`)) {
+                appData.operators = appData.operators.filter(o => o.id !== operatorId);
+                renderOperators();
+                updateStats();
+                showMessage(`✅ "${operator.name}" eliminato`, 'success');
+            }
+        }
+
+        function saveOperator() {
+            const name = document.getElementById('edit-operator-name').value.trim();
+            const phone = document.getElementById('edit-operator-phone').value.trim();
+            const shift = document.getElementById('edit-operator-shift').value;
+            const canDriveSpecial = document.getElementById('edit-operator-special').checked;
+
+            if (!name) {
+                alert('❌ Nome obbligatorio');
+                return;
+            }
+
+            if (appData.editingOperatorId) {
+                const operatorIndex = appData.operators.findIndex(o => o.id === appData.editingOperatorId);
+                if (operatorIndex !== -1) {
+                    appData.operators[operatorIndex] = { ...appData.operators[operatorIndex], name, phone, shift, canDriveSpecial };
+                    showMessage(`✅ "${name}" modificato`, 'success');
+                }
+            } else {
+                const newId = Math.max(...appData.operators.map(o => o.id), 0) + 1;
+                appData.operators.push({ id: newId, name, phone, shift, canDriveSpecial });
+                showMessage(`✅ "${name}" aggiunto`, 'success');
+            }
+
+            closeOperatorModal();
+            renderOperators();
+            updateStats();
+        }
+
+        function closeOperatorModal() {
+            document.getElementById('operator-modal').classList.remove('show');
+            clearOperatorForm();
+            appData.editingOperatorId = null;
+        }
+
+        function clearOperatorForm() {
+            document.getElementById('edit-operator-name').value = '';
+            document.getElementById('edit-operator-phone').value = '';
+            document.getElementById('edit-operator-shift').value = 'mattina';
+            document.getElementById('edit-operator-special').checked = false;
+        }
+
+        // ===== GESTIONE VEICOLI =====
+
+        function renderVehicles() {
+            const container = document.getElementById('vehicles-content');
+            
+            if (appData.vehicles.length === 0) {
+                container.innerHTML = `<div class="text-center" style="padding: 40px; color: #6b7280;"><div style="font-size: 48px; margin-bottom: 16px;">🚐</div><p>Nessun veicolo</p></div>`;
+                return;
+            }
+
+            container.innerHTML = appData.vehicles.map(vehicle => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div>
+                            <h3 style="margin: 0; color: #1f2937;">${vehicle.name}</h3>
+                            <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">🔢 Targa: ${vehicle.plate}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" onclick="editVehicle(${vehicle.id})" style="padding: 6px 12px; font-size: 12px;">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteVehicle(${vehicle.id})" style="padding: 6px 12px; font-size: 12px;">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Tipo</div>
+                            <div class="detail-value">${vehicle.isLongBase ? 'Passo Lungo' : 'Passo Standard'}</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Pedana Elevatrice</div>
+                            <div class="detail-value">
+                                <span class="badge ${vehicle.hasLift ? 'badge-success' : 'badge-warning'}">
+                                    ${vehicle.hasLift ? '✅ SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Pedana Laterale</div>
+                            <div class="detail-value">
+                                <span class="badge ${vehicle.hasSidePlatform ? 'badge-blue' : 'badge-warning'}">
+                                    ${vehicle.hasSidePlatform ? '✅ SÌ' : '❌ NO'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Posti Carrozzina</div>
+                            <div class="detail-value">${vehicle.wheelchairSpots}</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Posti Totali</div>
+                            <div class="detail-value">${vehicle.totalSeats}</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Guida Speciale</div>
+                            <div class="detail-value">
+                                <span class="badge ${vehicle.needsSpecialLicense ? 'badge-danger' : 'badge-success'}">
+                                    ${vehicle.needsSpecialLicense ? '⚠️ Richiesta' : '✅ Standard'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddVehicleModal() {
+            appData.editingVehicleId = null;
+            document.getElementById('vehicle-modal-title').textContent = 'Aggiungi Nuovo Veicolo';
+            clearVehicleForm();
+            document.getElementById('vehicle-modal').classList.add('show');
+        }
+
+        function editVehicle(vehicleId) {
+            const vehicle = appData.vehicles.find(v => v.id === vehicleId);
+            if (!vehicle) return;
+
+            appData.editingVehicleId = vehicleId;
+            document.getElementById('vehicle-modal-title').textContent = `Modifica: ${vehicle.name}`;
+            
+            document.getElementById('edit-vehicle-name').value = vehicle.name;
+            document.getElementById('edit-vehicle-plate').value = vehicle.plate;
+            document.getElementById('edit-vehicle-seats').value = vehicle.totalSeats;
+            document.getElementById('edit-vehicle-lift').checked = vehicle.hasLift;
+            document.getElementById('edit-vehicle-wheelchair').value = vehicle.wheelchairSpots;
+            document.getElementById('edit-vehicle-side-platform').checked = vehicle.hasSidePlatform;
+            document.getElementById('edit-vehicle-long-base').checked = vehicle.isLongBase;
+            document.getElementById('edit-vehicle-special-license').checked = vehicle.needsSpecialLicense;
+            
+            document.getElementById('vehicle-modal').classList.add('show');
+        }
+
+        function deleteVehicle(vehicleId) {
+            const vehicle = appData.vehicles.find(v => v.id === vehicleId);
+            if (!vehicle) return;
+
+            if (confirm(`Elimina il veicolo "${vehicle.name}"?`)) {
+                appData.vehicles = appData.vehicles.filter(v => v.id !== vehicleId);
+                renderVehicles();
+                updateStats();
+                showMessage(`✅ "${vehicle.name}" eliminato`, 'success');
+            }
+        }
+
+        function saveVehicle() {
+            const name = document.getElementById('edit-vehicle-name').value.trim();
+            const plate = document.getElementById('edit-vehicle-plate').value.trim();
+            const totalSeats = parseInt(document.getElementById('edit-vehicle-seats').value) || 6;
+            const hasLift = document.getElementById('edit-vehicle-lift').checked;
+            const wheelchairSpots = parseInt(document.getElementById('edit-vehicle-wheelchair').value) || 0;
+            const hasSidePlatform = document.getElementById('edit-vehicle-side-platform').checked;
+            const isLongBase = document.getElementById('edit-vehicle-long-base').checked;
+            const needsSpecialLicense = document.getElementById('edit-vehicle-special-license').checked;
+
+            if (!name || !plate) {
+                alert('❌ Nome e Targa obbligatori');
+                return;
+            }
+
+            if (appData.editingVehicleId) {
+                const vehicleIndex = appData.vehicles.findIndex(v => v.id === appData.editingVehicleId);
+                if (vehicleIndex !== -1) {
+                    appData.vehicles[vehicleIndex] = { ...appData.vehicles[vehicleIndex], name, plate, totalSeats, hasLift, wheelchairSpots, hasSidePlatform, isLongBase, needsSpecialLicense };
+                    showMessage(`✅ "${name}" modificato`, 'success');
+                }
+            } else {
+                const newId = Math.max(...appData.vehicles.map(v => v.id), 0) + 1;
+                appData.vehicles.push({ id: newId, name, plate, totalSeats, hasLift, wheelchairSpots, hasSidePlatform, isLongBase, needsSpecialLicense });
+                showMessage(`✅ "${name}" aggiunto`, 'success');
+            }
+
+            closeVehicleModal();
+            renderVehicles();
+            updateStats();
+        }
+
+        function closeVehicleModal() {
+            document.getElementById('vehicle-modal').classList.remove('show');
+            clearVehicleForm();
+            appData.editingVehicleId = null;
+        }
+
+        function clearVehicleForm() {
+            document.getElementById('edit-vehicle-name').value = '';
+            document.getElementById('edit-vehicle-plate').value = '';
+            document.getElementById('edit-vehicle-seats').value = '6';
+            document.getElementById('edit-vehicle-lift').checked = false;
+            document.getElementById('edit-vehicle-wheelchair').value = '0';
+            document.getElementById('edit-vehicle-side-platform').checked = false;
+            document.getElementById('edit-vehicle-long-base').checked = false;
+            document.getElementById('edit-vehicle-special-license').checked = false;
+        }
+
+        // ===== ALTRE FUNZIONI =====
+
+        function exportToExcel() {
+            if (appData.users.length === 0) {
+                alert('❌ Nessun utente da esportare');
+                return;
+            }
+
+            const exportData = [['Nome', 'Indirizzo', 'Telefono', 'Carrozzina', 'Pedane Laterali', 'Giorni', 'Turni', 'Priorità', 'Viaggio Mattino', 'Pickup Mattino', 'Viaggio Pomeriggio', 'Pickup Pomeriggio']];
+            appData.users.forEach(user => {
+                exportData.push([
+                    user.name, 
+                    user.address, 
+                    user.phone || '', 
+                    user.needsWheelchair ? 'Sì' : 'No', 
+                    user.needsPedals ? 'Sì' : 'No', 
+                    user.days, 
+                    user.shifts, 
+                    user.priority,
+                    user.morningTrip ? 'Sì' : 'No',
+                    user.morningPriority || 'normale',
+                    user.afternoonTrip ? 'Sì' : 'No',
+                    user.afternoonPriority || 'normale'
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Utenti");
+            XLSX.writeFile(wb, `utenti_centro_diurno_${new Date().toISOString().split('T')[0]}.xlsx`);
+            alert(`✅ Esportati ${appData.users.length} utenti!`);
+        }
+
+        function exportOperatorsToExcel() {
+            if (appData.operators.length === 0) {
+                alert('❌ Nessun operatore da esportare');
+                return;
+            }
+
+            const exportData = [['Nome', 'Telefono', 'Turno', 'Guida Veicoli Speciali']];
+            appData.operators.forEach(operator => {
+                exportData.push([
+                    operator.name,
+                    operator.phone || '',
+                    operator.shift,
+                    operator.canDriveSpecial ? 'Sì' : 'No'
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Operatori");
+            XLSX.writeFile(wb, `operatori_centro_diurno_${new Date().toISOString().split('T')[0]}.xlsx`);
+            alert(`✅ Esportati ${appData.operators.length} operatori!`);
+        }
+
+        function showOperatorsMessage(message, type = 'success') {
+            const statusDiv = document.getElementById('operators-upload-status');
+            statusDiv.innerHTML = `<div class="${type}-message">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 4000);
+        }
+
+        function optimizeRoutes() {
+            if (appData.users.length === 0) {
+                alert('❌ Carica prima gli utenti');
+                return;
+            }
+
+            const centroAddress = 'Via Due Palazzi 16, 35134 Padova';
+            
+            // Filtra utenti per turni
+            const morningUsers = appData.users.filter(u => u.morningTrip);
+            const afternoonUsers = appData.users.filter(u => u.afternoonTrip);
+            
+            const routes = [];
+
+            // ===== PERCORSI MATTINO (ANDATA) - Partenza ore 8:00 =====
+            if (morningUsers.length > 0) {
+                // Ordina utenti per priorità: primo -> normale -> ultimo
+                const sortedMorningUsers = [...morningUsers].sort((a, b) => {
+                    const priorityOrder = { 'primo': 0, 'normale': 1, 'ultimo': 2 };
+                    return priorityOrder[a.morningPriority || 'normale'] - priorityOrder[b.morningPriority || 'normale'];
+                });
+
+                // Dividi per tipo (carrozzina vs normale)
+                const wheelchairUsers = sortedMorningUsers.filter(u => u.needsWheelchair);
+                const regularUsers = sortedMorningUsers.filter(u => !u.needsWheelchair);
+
+                let wheelchairIndex = 0;
+                let regularIndex = 0;
+
+                // Assegna veicoli con pedana ai utenti con carrozzina
+                const liftVehicles = appData.vehicles.filter(v => v.hasLift);
+                liftVehicles.forEach((vehicle, idx) => {
+                    if (wheelchairIndex < wheelchairUsers.length || regularIndex < regularUsers.length) {
+                        const routeUsers = [];
+                        
+                        // Prima gli utenti con carrozzina
+                        const maxWheelchair = Math.min(vehicle.wheelchairSpots, wheelchairUsers.length - wheelchairIndex);
+                        for (let i = 0; i < maxWheelchair; i++) {
+                            if (wheelchairIndex < wheelchairUsers.length) {
+                                routeUsers.push(wheelchairUsers[wheelchairIndex]);
+                                wheelchairIndex++;
+                            }
+                        }
+
+                        // Poi utenti normali per riempire il veicolo
+                        const remainingSeats = vehicle.totalSeats - routeUsers.length;
+                        for (let i = 0; i < remainingSeats && regularIndex < regularUsers.length; i++) {
+                            routeUsers.push(regularUsers[regularIndex]);
+                            regularIndex++;
+                        }
+
+                        if (routeUsers.length > 0) {
+                            const compatibleOperators = appData.operators.filter(op => 
+                                ['mattina', 'entrambi'].includes(op.shift) &&
+                                !routes.some(r => r.operator.id === op.id) &&
+                                (vehicle.needsSpecialLicense ? op.canDriveSpecial : true)
+                            );
+                            const operator = compatibleOperators[0] || appData.operators.find(op => ['mattina', 'entrambi'].includes(op.shift));
+
+                            // Costruisci percorso: Centro -> Utenti -> Centro
+                            const addresses = [centroAddress, ...routeUsers.map(u => u.address), centroAddress];
+                            const mapsUrl = `https://www.google.com/maps/dir/${addresses.map(addr => encodeURIComponent(addr)).join('/')}`;
+
+                            routes.push({
+                                id: routes.length + 1,
+                                type: 'Andata Mattino',
+                                vehicle: vehicle,
+                                operator: operator,
+                                users: routeUsers,
+                                startTime: '08:00',
+                                estimatedTime: routeUsers.length * 8 + 25,
+                                mapsUrl: mapsUrl,
+                                addresses: addresses
+                            });
+                        }
+                    }
+                });
+
+                // Veicoli rimanenti per utenti normali
+                const remainingVehicles = appData.vehicles.filter(v => !routes.some(r => r.vehicle.id === v.id));
+                remainingVehicles.forEach((vehicle) => {
+                    if (regularIndex < regularUsers.length) {
+                        const routeUsers = [];
+                        const maxUsers = Math.min(vehicle.totalSeats, regularUsers.length - regularIndex);
+                        
+                        for (let i = 0; i < maxUsers; i++) {
+                            if (regularIndex < regularUsers.length) {
+                                routeUsers.push(regularUsers[regularIndex]);
+                                regularIndex++;
+                            }
+                        }
+
+                        if (routeUsers.length > 0) {
+                            const compatibleOperators = appData.operators.filter(op => 
+                                ['mattina', 'entrambi'].includes(op.shift) &&
+                                !routes.some(r => r.operator.id === op.id) &&
+                                (vehicle.needsSpecialLicense ? op.canDriveSpecial : true)
+                            );
+                            const operator = compatibleOperators[0] || appData.operators.find(op => ['mattina', 'entrambi'].includes(op.shift));
+
+                            const addresses = [centroAddress, ...routeUsers.map(u => u.address), centroAddress];
+                            const mapsUrl = `https://www.google.com/maps/dir/${addresses.map(addr => encodeURIComponent(addr)).join('/')}`;
+
+                            routes.push({
+                                id: routes.length + 1,
+                                type: 'Andata Mattino',
+                                vehicle: vehicle,
+                                operator: operator,
+                                users: routeUsers,
+                                startTime: '08:00',
+                                estimatedTime: routeUsers.length * 6 + 20,
+                                mapsUrl: mapsUrl,
+                                addresses: addresses
+                            });
+                        }
+                    }
+                });
+            }
+
+            // ===== PERCORSI POMERIGGIO (RITORNO) - Partenza ore 15:30 =====
+            if (afternoonUsers.length > 0) {
+                // Ordina utenti per priorità pickup pomeriggio
+                const sortedAfternoonUsers = [...afternoonUsers].sort((a, b) => {
+                    const priorityOrder = { 'primo': 0, 'normale': 1, 'ultimo': 2 };
+                    return priorityOrder[a.afternoonPriority || 'normale'] - priorityOrder[b.afternoonPriority || 'normale'];
+                });
+
+                const wheelchairUsersAft = sortedAfternoonUsers.filter(u => u.needsWheelchair);
+                const regularUsersAft = sortedAfternoonUsers.filter(u => !u.needsWheelchair);
+
+                let wheelchairIndexAft = 0;
+                let regularIndexAft = 0;
+
+                // Reset operatori per il pomeriggio
+                const usedOperatorsMorning = routes.map(r => r.operator.id);
+
+                const liftVehiclesAft = appData.vehicles.filter(v => v.hasLift);
+                liftVehiclesAft.forEach((vehicle, idx) => {
+                    if (wheelchairIndexAft < wheelchairUsersAft.length || regularIndexAft < regularUsersAft.length) {
+                        const routeUsers = [];
+                        
+                        const maxWheelchair = Math.min(vehicle.wheelchairSpots, wheelchairUsersAft.length - wheelchairIndexAft);
+                        for (let i = 0; i < maxWheelchair; i++) {
+                            if (wheelchairIndexAft < wheelchairUsersAft.length) {
+                                routeUsers.push(wheelchairUsersAft[wheelchairIndexAft]);
+                                wheelchairIndexAft++;
+                            }
+                        }
+
+                        const remainingSeats = vehicle.totalSeats - routeUsers.length;
+                        for (let i = 0; i < remainingSeats && regularIndexAft < regularUsersAft.length; i++) {
+                            routeUsers.push(regularUsersAft[regularIndexAft]);
+                            regularIndexAft++;
+                        }
+
+                        if (routeUsers.length > 0) {
+                            const compatibleOperators = appData.operators.filter(op => 
+                                ['pomeriggio', 'entrambi'].includes(op.shift) &&
+                                (vehicle.needsSpecialLicense ? op.canDriveSpecial : true)
+                            );
+                            const operator = compatibleOperators[idx % compatibleOperators.length] || appData.operators.find(op => ['pomeriggio', 'entrambi'].includes(op.shift));
+
+                            // Per il ritorno: Centro -> Utenti (in ordine inverso per ultimo essere lasciato per primo)
+                            const reverseUsers = [...routeUsers].reverse();
+                            const addresses = [centroAddress, ...reverseUsers.map(u => u.address)];
+                            const mapsUrl = `https://www.google.com/maps/dir/${addresses.map(addr => encodeURIComponent(addr)).join('/')}`;
+
+                            routes.push({
+                                id: routes.length + 1,
+                                type: 'Ritorno Pomeriggio',
+                                vehicle: vehicle,
+                                operator: operator,
+                                users: routeUsers,
+                                startTime: '15:30',
+                                estimatedTime: routeUsers.length * 8 + 25,
+                                mapsUrl: mapsUrl,
+                                addresses: addresses
+                            });
+                        }
+                    }
+                });
+
+                // Resto degli utenti pomeriggio
+                const remainingVehiclesAft = appData.vehicles.filter(v => 
+                    !routes.filter(r => r.type === 'Ritorno Pomeriggio').some(r => r.vehicle.id === v.id)
+                );
+                remainingVehiclesAft.forEach((vehicle, idx) => {
+                    if (regularIndexAft < regularUsersAft.length) {
+                        const routeUsers = [];
+                        const maxUsers = Math.min(vehicle.totalSeats, regularUsersAft.length - regularIndexAft);
+                        
+                        for (let i = 0; i < maxUsers; i++) {
+                            if (regularIndexAft < regularUsersAft.length) {
+                                routeUsers.push(regularUsersAft[regularIndexAft]);
+                                regularIndexAft++;
+                            }
+                        }
+
+                        if (routeUsers.length > 0) {
+                            const compatibleOperators = appData.operators.filter(op => 
+                                ['pomeriggio', 'entrambi'].includes(op.shift) &&
+                                (vehicle.needsSpecialLicense ? op.canDriveSpecial : true)
+                            );
+                            const operator = compatibleOperators[idx % compatibleOperators.length] || appData.operators.find(op => ['pomeriggio', 'entrambi'].includes(op.shift));
+
+                            const reverseUsers = [...routeUsers].reverse();
+                            const addresses = [centroAddress, ...reverseUsers.map(u => u.address)];
+                            const mapsUrl = `https://www.google.com/maps/dir/${addresses.map(addr => encodeURIComponent(addr)).join('/')}`;
+
+                            routes.push({
+                                id: routes.length + 1,
+                                type: 'Ritorno Pomeriggio',
+                                vehicle: vehicle,
+                                operator: operator,
+                                users: routeUsers,
+                                startTime: '15:30',
+                                estimatedTime: routeUsers.length * 6 + 20,
+                                mapsUrl: mapsUrl,
+                                addresses: addresses
+                            });
+                        }
+                    }
+                });
+            }
+
+            appData.routes = routes;
+            renderRoutes();
+            showMessage(`✅ Generati ${routes.length} percorsi ottimizzati! (${routes.filter(r => r.type === 'Andata Mattino').length} andata, ${routes.filter(r => r.type === 'Ritorno Pomeriggio').length} ritorno)`, 'success');
+        }
+
+        function renderRoutes() {
+            const container = document.getElementById('routes-content');
+            
+            if (appData.routes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center" style="padding: 40px; color: #6b7280;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🗺️</div>
+                        <p>Nessun percorso generato</p>
+                        <p style="font-size: 14px;">Clicca "Ottimizza Percorsi" nel Dashboard per generare i percorsi</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Separa percorsi mattino e pomeriggio
+            const morningRoutes = appData.routes.filter(r => r.type === 'Andata Mattino');
+            const afternoonRoutes = appData.routes.filter(r => r.type === 'Ritorno Pomeriggio');
+
+            let html = '';
+
+            // Sezione Percorsi Mattino
+            if (morningRoutes.length > 0) {
+                html += `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #1f2937; margin-bottom: 16px; padding: 12px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            🌅 PERCORSI ANDATA MATTINO - Partenza ore 8:00 da Via Due Palazzi 16
+                        </h3>
+                        <div class="user-grid">
+                            ${morningRoutes.map(route => renderSingleRoute(route)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Sezione Percorsi Pomeriggio
+            if (afternoonRoutes.length > 0) {
+                html += `
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #1f2937; margin-bottom: 16px; padding: 12px; background: #dbeafe; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            🌆 PERCORSI RITORNO POMERIGGIO - Partenza ore 15:30 da Via Due Palazzi 16
+                        </h3>
+                        <div class="user-grid">
+                            ${afternoonRoutes.map(route => renderSingleRoute(route)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderSingleRoute(route) {
+            return `
+                <div class="user-card" style="margin-bottom: 16px; border-left: 4px solid ${route.type === 'Andata Mattino' ? '#f59e0b' : '#3b82f6'};">
+                    <div class="user-header">
+                        <div>
+                            <h3 style="margin: 0; color: #1f2937;">
+                                ${route.type === 'Andata Mattino' ? '🌅' : '🌆'} Percorso ${route.id}
+                                <span style="font-size: 14px; color: #6b7280;"> - ${route.type}</span>
+                            </h3>
+                            <p style="color: #6b7280; font-size: 14px; margin: 4px 0;">
+                                ⏰ Partenza ore ${route.startTime} - ⏱️ Durata stimata: ${route.estimatedTime} minuti
+                            </p>
+                        </div>
+                        <a href="${route.mapsUrl}" target="_blank" class="btn btn-success" style="text-decoration: none; padding: 8px 12px; font-size: 12px;">
+                            🧭 Google Maps
+                        </a>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Veicolo</div>
+                            <div class="detail-value">${route.vehicle.name} (${route.vehicle.plate})</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Operatore</div>
+                            <div class="detail-value">${route.operator ? route.operator.name : 'Non assegnato'}</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Utenti</div>
+                            <div class="detail-value">${route.users.length} persone</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-label">Carrozzine</div>
+                            <div class="detail-value">${route.users.filter(u => u.needsWheelchair).length}</div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-label">Pedane Laterali</div>
+                            <div class="detail-value">${route.users.filter(u => u.needsPedals).length}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 16px; padding: 12px; background: #f9fafb; border-radius: 6px;">
+                        <strong style="color: #374151; margin-bottom: 8px; display: block;">
+                            📍 ${route.type === 'Andata Mattino' ? 'Ordine di pickup (Centro → Utenti → Centro):' : 'Ordine di drop-off (Centro → Utenti):'}
+                        </strong>
+                        
+                        ${route.type === 'Andata Mattino' ? 
+                            `<div style="padding: 6px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px; background: #dbeafe; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                <strong>🏢 PARTENZA: Via Due Palazzi 16, 35134 Padova (ore 8:00)</strong>
+                            </div>` : 
+                            `<div style="padding: 6px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px; background: #dbeafe; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                <strong>🏢 PARTENZA: Via Due Palazzi 16, 35134 Padova (ore 15:30)</strong>
+                            </div>`
+                        }
+                        
+                        ${route.users.map((user, idx) => {
+                            const priorityBadge = route.type === 'Andata Mattino' 
+                                ? (user.morningPriority === 'primo' ? '🥇 PRIMO' : user.morningPriority === 'ultimo' ? '🥉 ULTIMO' : '➡️ NORMALE')
+                                : (user.afternoonPriority === 'primo' ? '🥇 PRIMO' : user.afternoonPriority === 'ultimo' ? '🥉 ULTIMO' : '➡️ NORMALE');
+                            
+                            return `<div style="padding: 6px 0; border-bottom: 1px solid #e5e7eb; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>${idx + 1}. ${user.name}</strong><br>
+                                    <span style="color: #6b7280; font-size: 12px;">${user.address}</span>
+                                </div>
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                    <span class="badge badge-blue" style="font-size: 10px;">${priorityBadge}</span>
+                                    ${user.needsWheelchair ? '<span class="badge badge-warning">♿</span>' : ''}
+                                    ${user.needsPedals ? '<span class="badge badge-blue">🔧</span>' : ''}
+                                </div>
+                            </div>`;
+                        }).join('')}
+                        
+                        ${route.type === 'Andata Mattino' ? 
+                            `<div style="padding: 8px 0; font-size: 14px; background: #dcfce7; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                                <strong>🏢 ARRIVO: Via Due Palazzi 16, 35134 Padova</strong>
+                            </div>` : ''
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== INIZIALIZZAZIONE =====
+
+        // Excel upload utenti
+        document.getElementById('excel-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showMessage('📖 Lettura file utenti in corso...', 'success');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    const users = [];
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (!row || !row[0] || row[0].toString().trim() === '') continue;
+                        
+                        users.push({
+                            id: users.length + 1,
+                            name: row[0].toString().trim(),
+                            address: row[1] ? row[1].toString().trim() : '',
+                            phone: row[2] ? row[2].toString().trim() : '',
+                            needsWheelchair: row[3] ? row[3].toString().toLowerCase().includes('s') : false,
+                            needsPedals: row[4] ? row[4].toString().toLowerCase().includes('s') : false,
+                            days: row[5] ? row[5].toString().trim() : 'Lun,Mar,Mer,Gio,Ven',
+                            shifts: row[6] ? row[6].toString().trim() : 'Entrambi',
+                            priority: row[7] ? row[7].toString().trim() : 'Normale',
+                            // Nuovi campi con valori di default se non presenti
+                            morningTrip: row[8] ? row[8].toString().toLowerCase().includes('s') : true,
+                            morningPriority: row[9] ? row[9].toString().toLowerCase().trim() : 'normale',
+                            afternoonTrip: row[10] ? row[10].toString().toLowerCase().includes('s') : true,
+                            afternoonPriority: row[11] ? row[11].toString().toLowerCase().trim() : 'normale'
+                        });
+                    }
+
+                    if (users.length === 0) throw new Error('Nessun utente valido trovato');
+
+                    appData.users = users;
+                    updateStats();
+                    renderUsers();
+                    showMessage(`🎉 Caricati ${users.length} utenti!`, 'success');
+
+                } catch (error) {
+                    showMessage(`❌ Errore: ${error.message}`, 'error');
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Excel upload operatori
+        document.getElementById('operators-excel-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showOperatorsMessage('📖 Lettura file operatori in corso...', 'success');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    const operators = [];
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (!row || !row[0] || row[0].toString().trim() === '') continue;
+                        
+                        operators.push({
+                            id: operators.length + 1,
+                            name: row[0].toString().trim(),
+                            phone: row[1] ? row[1].toString().trim() : '',
+                            shift: row[2] ? row[2].toString().trim() : 'mattina',
+                            canDriveSpecial: row[3] ? row[3].toString().toLowerCase().includes('s') : false
+                        });
+                    }
+
+                    if (operators.length === 0) throw new Error('Nessun operatore valido trovato');
+
+                    appData.operators = operators;
+                    updateStats();
+                    renderOperators();
+                    showOperatorsMessage(`🎉 Caricati ${operators.length} operatori!`, 'success');
+
+                } catch (error) {
+                    showOperatorsMessage(`❌ Errore: ${error.message}`, 'error');
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Modal close on outside click
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                if (event.target.id === 'user-modal') closeModal();
+                if (event.target.id === 'operator-modal') closeOperatorModal();
+                if (event.target.id === 'vehicle-modal') closeVehicleModal();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            console.log('🚀 Centro Diurno Padova inizializzato');
+        });
+    </script>
+</body>
+</html>
